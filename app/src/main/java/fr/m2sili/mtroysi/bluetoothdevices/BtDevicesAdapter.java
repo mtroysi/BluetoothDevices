@@ -84,4 +84,10 @@ public class BtDevicesAdapter extends ArrayAdapter<BtDevice> {
         }
         return found;
     }
+
+    public BtDevice convertAndAdd(BluetoothDevice device) {
+        BtDevice btDevice = new BtDevice(device.getName(), device.getBluetoothClass().getMajorDeviceClass(), device.getAddress(), device.getBondState());
+        add(btDevice);
+        return btDevice;
+    }
 }

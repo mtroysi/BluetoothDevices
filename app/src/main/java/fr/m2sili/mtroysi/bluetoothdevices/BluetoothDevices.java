@@ -5,9 +5,6 @@ import android.os.Bundle;
 
 public class BluetoothDevices extends Activity  {
 
-    private static final String TAG_MAIN_FRAGMENT = "main_fragment";
-    private MainFragment mainFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -20,6 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static android.content.ContentValues.TAG;
@@ -31,6 +33,7 @@ import static android.content.ContentValues.TAG;
 public class MainFragment extends ListFragment {
 
     private BtDevicesAdapter adapter;
+    private List devices = new ArrayList();
     private BroadcastReceiver mBtBroadCastReceiver;
     private static int count = 0;
 
@@ -40,6 +43,14 @@ public class MainFragment extends ListFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mainActivityListener = (BluetoothDevices) activity;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(savedInstanceState != null) {
+            devices = savedInstanceState.getParcelableArrayList("knownDevices");
+        }
     }
 
     @Override
@@ -54,8 +65,8 @@ public class MainFragment extends ListFragment {
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     if (!adapter.contains(device.getAddress())) {
-                        BtDevice btDevice = new BtDevice(device.getName(), device.getBluetoothClass().getMajorDeviceClass(), device.getAddress(), device.getBondState());
-                        adapter.add(btDevice);
+                        devices.add(device);
+                        BtDevice btDevice = adapter.convertAndAdd(device);
                         adapter.notifyDataSetChanged();
                         Notification notification =
                                 new Notification.Builder(mainActivityListener)
@@ -87,6 +98,11 @@ public class MainFragment extends ListFragment {
         adapter = new BtDevicesAdapter(inflater.getContext());
         setListAdapter(adapter);
         getBondedDevices();
+        if(!devices.isEmpty()) {
+            for (BluetoothDevice device : (List<BluetoothDevice>)devices) {
+                adapter.convertAndAdd(device);
+            }
+        }
         return rootView;
     }
 
@@ -115,9 +131,9 @@ public class MainFragment extends ListFragment {
             if (pairedDevices.size() > 0) {
                 // Loop through paired devices
                 for (BluetoothDevice device : pairedDevices) {
-                    BtDevice btDevice = new BtDevice(device.getName(), device.getBluetoothClass().getMajorDeviceClass(), device.getAddress(), device.getBondState());
                     if (!adapter.contains(device.getAddress())) {
-                        adapter.add(btDevice);
+//                        devices.add(device);
+                        adapter.convertAndAdd(device);
                     }
                 }
             }
@@ -137,4 +153,9 @@ public class MainFragment extends ListFragment {
         mainActivityListener.unregisterReceiver(mBtBroadCastReceiver);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("knownDevices", (ArrayList<BluetoothDevice>)devices);
+    }
 }
