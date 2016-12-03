@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="mtroysi.m2sili.explorer.Explorer">
+
+    <item
+        android:id="@+id/refresh"
+        android:title="Actualiser"
+        android:icon="@drawable/ic_refresh"
+        android:showAsAction="always">
+    </item>
+</menu>
